@@ -1,12 +1,14 @@
-// routes/customer.js
-const express = require('express');
-const router = express.Router();
-const prisma = require('../prisma');
+import { Router, Request, Response } from "express";
+import prisma from "../lib/prisma";
+
+const router = Router();
 
 // ایجاد مشتری جدید
-router.post('/', async (req, res) => {
+router.post("/", async (req: Request, res: Response) => {
     try {
-        const { firstName, lastName, phoneNumber, cardNumber, description } = req.body;
+        const { firstName, lastName, phoneNumber, cardNumber, description } =
+            req.body;
+
         const customer = await prisma.customer.create({
             data: {
                 firstName,
@@ -16,70 +18,85 @@ router.post('/', async (req, res) => {
                 description,
             },
         });
+
         res.status(201).json(customer);
-    } catch (error) {
+    } catch (error: any) {
         res.status(400).json({ error: error.message });
     }
 });
 
-// دریافت همه مشتری‌ها (با موجودی‌ها)
-router.get('/', async (req, res) => {
+// دریافت همه مشتری‌ها
+router.get("/", async (_req: Request, res: Response) => {
     try {
         const customers = await prisma.customer.findMany({
             include: {
                 balances: true,
             },
         });
+
         res.json(customers);
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// دریافت یک مشتری با موجودی‌ها و آخرین تراکنش‌ها
-router.get('/:id', async (req, res) => {
+// دریافت یک مشتری
+router.get("/:id", async (req: Request, res: Response) => {
     try {
+        const id = Number(req.params.id);
+
         const customer = await prisma.customer.findUnique({
-            where: { id: parseInt(req.params.id) },
+            where: { id },
             include: {
                 balances: true,
                 logs: {
-                    take: 10, // ۱۰ تراکنش آخر
-                    orderBy: { createdAt: 'desc' },
+                    take: 10,
+                    orderBy: { createdAt: "desc" },
                 },
             },
         });
-        if (!customer) return res.status(404).json({ error: 'Customer not found' });
+
+        if (!customer) {
+            return res.status(404).json({ error: "Customer not found" });
+        }
+
         res.json(customer);
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// به‌روزرسانی مشتری
-router.put('/:id', async (req, res) => {
+// آپدیت مشتری
+router.put("/:id", async (req: Request, res: Response) => {
     try {
-        const { firstName, lastName, phoneNumber, cardNumber, description } = req.body;
+        const id = Number(req.params.id);
+        const { firstName, lastName, phoneNumber, cardNumber, description } =
+            req.body;
+
         const customer = await prisma.customer.update({
-            where: { id: parseInt(req.params.id) },
+            where: { id },
             data: { firstName, lastName, phoneNumber, cardNumber, description },
         });
+
         res.json(customer);
-    } catch (error) {
+    } catch (error: any) {
         res.status(400).json({ error: error.message });
     }
 });
 
-// حذف مشتری (با رعایت احتیاط)
-router.delete('/:id', async (req, res) => {
+// حذف مشتری
+router.delete("/:id", async (req: Request, res: Response) => {
     try {
+        const id = Number(req.params.id);
+
         await prisma.customer.delete({
-            where: { id: parseInt(req.params.id) },
+            where: { id },
         });
+
         res.status(204).send();
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-module.exports = router;
+export default router;

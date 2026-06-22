@@ -5,7 +5,9 @@ Content-Type: application/json
 {
   "firstName": "Ali",
   "lastName": "Ahmadi",
-  "phoneNumber": "09123456789"
+  "phoneNumber": "09123456789",
+  "cardNumber": "6124874591348725",
+  "description": "TozihatTozihatTozihatTozihat"
 }
 
 
@@ -16,8 +18,8 @@ Content-Type: application/json
 {
   "customerId": 1,
   "currency": "USD",
-  "amount": 1200,
-  "note": "خرید کالا"
+  "amount": 400,
+  "note": "خرید ازمدئ"
 }
 
 

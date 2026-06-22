@@ -1,18 +1,13 @@
-// routes/transaction.js
-const express = require('express');
-const router = express.Router();
-const prisma = require('../prisma');
+import { Router, Request, Response } from "express";
+import prisma from "../lib/prisma";
 
-// ایجاد تراکنش جدید و به‌روزرسانی خودکار موجودی
-router.post('/', async (req, res) => {
+const router = Router();
+
+router.post("/", async (req: Request, res: Response) => {
     try {
         const { customerId, currency, amount, note } = req.body;
 
-        // amount باید یک عدد صحیح باشد (مثلاً 1000 تومان، 500 دلار، 250 دینار)
-        // currency یکی از 'TOMAN', 'USD', 'IQD'
-
         const result = await prisma.$transaction(async (tx) => {
-            // ۱. ثبت لاگ تراکنش
             const log = await tx.balanceLog.create({
                 data: {
                     customerId,
@@ -22,13 +17,12 @@ router.post('/', async (req, res) => {
                 },
             });
 
-            // ۲. یافتن یا ایجاد CustomerBalance برای این ارز
-            const balanceRecord = await tx.customerBalance.upsert({
+            const balance = await tx.customerBalance.upsert({
                 where: {
                     customerId_currency: { customerId, currency },
                 },
                 update: {
-                    balance: { increment: amount }, // افزایش یا کاهش (اگر amount منفی باشد کاهش می‌دهد)
+                    balance: { increment: amount },
                 },
                 create: {
                     customerId,
@@ -37,35 +31,43 @@ router.post('/', async (req, res) => {
                 },
             });
 
-            return { log, balance: balanceRecord };
+            return { log, balance };
         });
 
         res.status(201).json({
-            message: 'Transaction successful',
+            message: "Transaction successful",
             transaction: result.log,
             newBalance: result.balance,
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(400).json({ error: error.message });
     }
 });
 
-// دریافت تاریخچه تراکنش‌های یک مشتری (فیلتر با ارز اختیاری)
-router.get('/customer/:customerId', async (req, res) => {
-    try {
-        const { currency } = req.query;
-        const where = { customerId: parseInt(req.params.customerId) };
-        if (currency) {
-            where.currency = currency;
-        }
-        const logs = await prisma.balanceLog.findMany({
-            where,
-            orderBy: { createdAt: 'desc' },
-        });
-        res.json(logs);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// تاریخچه تراکنش‌ها
+router.get(
+    "/customer/:customerId",
+    async (req: Request, res: Response) => {
+        try {
+            const customerId = Number(req.params.customerId);
+            const { currency } = req.query;
 
-module.exports = router;
+            const where: any = { customerId };
+
+            if (currency) {
+                where.currency = currency;
+            }
+
+            const logs = await prisma.balanceLog.findMany({
+                where,
+                orderBy: { createdAt: "desc" },
+            });
+
+            res.json(logs);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
+
+export default router;
