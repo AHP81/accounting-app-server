@@ -1,0 +1,29 @@
+### ایجاد مشتری
+POST http://localhost:3000/api/customers
+Content-Type: application/json
+
+{
+  "firstName": "Ali",
+  "lastName": "Ahmadi",
+  "phoneNumber": "09123456789"
+}
+
+
+### ایجاد تراکنش
+POST http://localhost:3000/api/transactions
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "currency": "USD",
+  "amount": 1200,
+  "note": "خرید کالا"
+}
+
+
+### دریافت مشتری
+GET http://localhost:3000/api/customers/1
+
+
+### تاریخچه تراکنش‌ها
+GET http://localhost:3000/api/transactions/customer/1?currency=USD

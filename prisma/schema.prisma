@@ -1,23 +1,56 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
 }
 
-model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
+enum Currency {
+  TOMAN
+  USD
+  IQD
+}
 
-  role String @default("admin")
+model Customer {
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  phoneNumber String?  @unique
+  cardNumber  String?  @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  createdAt DateTime @default(now())
+  balances CustomerBalance[]
+  logs     BalanceLog[]
+}
+
+model CustomerBalance {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  currency   Currency
+  balance    Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  customer Customer     @relation(fields: [customerId], references: [id])
+  logs     BalanceLog[]
+
+  @@unique([customerId, currency])
+}
+
+model BalanceLog {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  balanceId  Int? // 👈 مهم: اتصال به CustomerBalance
+  currency   Currency
+  amount     Int
+  note       String?
+  createdAt  DateTime @default(now())
+
+  customer Customer         @relation(fields: [customerId], references: [id])
+  balance  CustomerBalance? @relation(fields: [balanceId], references: [id])
+
+  @@index([customerId, currency])
+  @@index([balanceId])
 }
