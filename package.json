@@ -8,6 +8,9 @@
     "build": "tsc",
     "start": "node dist/server.js"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AHP81/accounting-app-server.git"
@@ -35,6 +38,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.0.0",
     "prisma": "^6.19.3",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }

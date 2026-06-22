@@ -6,13 +6,12 @@ const router = Router();
 // ایجاد مشتری جدید
 router.post("/", async (req: Request, res: Response) => {
     try {
-        const { firstName, lastName, phoneNumber, cardNumber, description } =
+        const { name, phoneNumber, cardNumber, description } =
             req.body;
 
         const customer = await prisma.customer.create({
             data: {
-                firstName,
-                lastName,
+                name,
                 phoneNumber,
                 cardNumber,
                 description,
@@ -70,12 +69,12 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
-        const { firstName, lastName, phoneNumber, cardNumber, description } =
+        const { name, phoneNumber, cardNumber, description } =
             req.body;
 
         const customer = await prisma.customer.update({
             where: { id },
-            data: { firstName, lastName, phoneNumber, cardNumber, description },
+            data: { name, phoneNumber, cardNumber, description },
         });
 
         res.json(customer);

@@ -3,10 +3,9 @@ POST http://localhost:3000/api/customers
 Content-Type: application/json
 
 {
-  "firstName": "Ali",
-  "lastName": "Ahmadi",
+  "name": "Ali Ahmadi",
   "phoneNumber": "09123456789",
-  "cardNumber": "6124874591348725",
+  "cardNumber": "6037991874465128",
   "description": "TozihatTozihatTozihatTozihat"
 }
 
@@ -16,15 +15,15 @@ POST http://localhost:3000/api/transactions
 Content-Type: application/json
 
 {
-  "customerId": 1,
-  "currency": "USD",
-  "amount": 400,
-  "note": "خرید ازمدئ"
+  "customerId": 17,
+  "currency": "TOMAN",
+  "amount": -12000000,
+  "note": "باید 12 تومن بزم به کارت"
 }
 
 
 ### دریافت مشتری
-GET http://localhost:3000/api/customers/1
+GET http://localhost:3000/api/customers/17
 
 
 ### تاریخچه تراکنش‌ها

@@ -15,8 +15,7 @@ enum Currency {
 
 model Customer {
   id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String
+  name        String
   phoneNumber String?  @unique
   cardNumber  String?  @unique
   description String?
