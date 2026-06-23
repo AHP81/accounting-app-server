@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import customerRoutes from "./routes/customer";
 import transactionRoutes from "./routes/transaction";
+import tradingRoutes from "./routes/trading";
 const app = express();
 
 // middleware
@@ -11,7 +12,7 @@ app.use(express.json());
 // routes
 app.use("/api/customers", customerRoutes);
 app.use("/api/transactions", transactionRoutes);
-// app.use("/api/balances", balanceRoutes);
+app.use("/api/trading", tradingRoutes);
 
 const PORT = Number(process.env.PORT) || 3000;
 

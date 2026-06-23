@@ -28,3 +28,8 @@ GET http://localhost:3000/api/customers/17
 
 ### تاریخچه تراکنش‌ها
 GET http://localhost:3000/api/transactions/customer/1?currency=USD
+
+
+###
+http://localhost:3000/api/trading
+###

@@ -1,73 +1,29 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import { createTransactionController } from "../controllers/transaction.controller";
 import prisma from "../lib/prisma";
 
 const router = Router();
 
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", createTransactionController);
+
+// history
+router.get("/customer/:customerId", async (req, res) => {
     try {
-        const { customerId, currency, amount, note } = req.body;
+        const customerId = Number(req.params.customerId);
+        const currency = req.query.currency as string | undefined;
 
-        const result = await prisma.$transaction(async (tx) => {
-            const log = await tx.balanceLog.create({
-                data: {
-                    customerId,
-                    currency,
-                    amount,
-                    note,
-                },
-            });
-
-            const balance = await tx.customerBalance.upsert({
-                where: {
-                    customerId_currency: { customerId, currency },
-                },
-                update: {
-                    balance: { increment: amount },
-                },
-                create: {
-                    customerId,
-                    currency,
-                    balance: amount,
-                },
-            });
-
-            return { log, balance };
+        const logs = await prisma.balanceLog.findMany({
+            where: {
+                customerId,
+                ...(currency ? { currency: currency as any } : {}),
+            },
+            orderBy: { createdAt: "desc" },
         });
 
-        res.status(201).json({
-            message: "Transaction successful",
-            transaction: result.log,
-            newBalance: result.balance,
-        });
-    } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.json(logs);
+    } catch (e: any) {
+        res.status(500).json({ error: e.message });
     }
 });
-
-// تاریخچه تراکنش‌ها
-router.get(
-    "/customer/:customerId",
-    async (req: Request, res: Response) => {
-        try {
-            const customerId = Number(req.params.customerId);
-            const { currency } = req.query;
-
-            const where: any = { customerId };
-
-            if (currency) {
-                where.currency = currency;
-            }
-
-            const logs = await prisma.balanceLog.findMany({
-                where,
-                orderBy: { createdAt: "desc" },
-            });
-
-            res.json(logs);
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
-    }
-);
 
 export default router;
